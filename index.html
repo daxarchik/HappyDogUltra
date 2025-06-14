@@ -117,16 +117,26 @@
 
     <script>
       window.addEventListener("load", function () {
-          const hash = window.location.hash.slice(1); // убираем #
+          const hash = window.location.hash.slice(1);
           const params = new URLSearchParams(hash);
           const tgWebAppData = params.get("tgWebAppData");
 
           if (tgWebAppData && typeof unityInstance !== "undefined") {
               console.log("📦 tgWebAppData найден и отправляется в Unity");
-              unityInstance.SendMessage("Game", "ReceiveTGData", tgWebAppData); // «Game» — имя объекта, где висит скрипт
+              try {
+                const decoded = decodeURIComponent(tgWebAppData);
+                const match = decoded.match(/user=(\{.+?\})/);
+                if (match && match[1]) {
+                    unityInstance.SendMessage("Game", "ReceiveTGData", match[1]);
+                } else {
+                    console.warn("❌ Не удалось найти поле user в tgWebAppData");
+                }
+              } catch (e) {
+                  console.error("❌ Ошибка обработки tgWebAppData:", e);
+              }
           } else {
               console.warn("🚫 tgWebAppData не найден в URL или unityInstance не готов");
-          }
+          } 
       });
     </script>
   </body>
