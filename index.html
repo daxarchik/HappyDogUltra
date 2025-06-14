@@ -117,19 +117,16 @@
 
     <script>
       window.addEventListener("load", function () {
-        try {
-          const hash = window.location.hash.slice(1); // убираем #
-          const params = new URLSearchParams(hash);
-          const tgWebAppData = params.get("tgWebAppData");
-
-          if (tgWebAppData && typeof unityInstance !== "undefined") {
-            console.log("📦 tgWebAppData найден и отправляется в Unity");
-            unityInstance.SendMessage("Game", "ReceiveTGData", decodeURIComponent(tgWebAppData));
-          } else {
-            console.warn("🚫 tgWebAppData не найден или unityInstance не готов");
-          }
-        } catch (e) {
-          console.error("❌ Ошибка при отправке tgWebAppData:", e);
+        // убираем ведущий ‘#’ и разбираем пары ключ=значение
+        const hash = window.location.hash.slice(1);
+        const params = new URLSearchParams(hash);
+        const raw = params.get("tgWebAppData");
+        if (raw && typeof unityInstance !== "undefined") {
+          // отправляем прямо в метод ReceiveTGData вашего Game-скрипта
+          unityInstance.SendMessage("Game", "ReceiveTGData", raw);
+          console.log("➤ Sent tgWebAppData to Unity:", raw);
+        } else {
+          console.warn("☠️ tgWebAppData not found or unityInstance missing");
         }
       });
     </script>
