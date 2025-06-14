@@ -114,5 +114,20 @@
       document.body.appendChild(script);
 
     </script>
+
+    <script>
+      window.addEventListener("load", function () {
+          const hash = window.location.hash.slice(1); // убираем #
+          const params = new URLSearchParams(hash);
+          const tgWebAppData = params.get("tgWebAppData");
+
+          if (tgWebAppData && typeof unityInstance !== "undefined") {
+              console.log("📦 tgWebAppData найден и отправляется в Unity");
+              unityInstance.SendMessage("Game", "ReceiveTGData", tgWebAppData); // «Game» — имя объекта, где висит скрипт
+          } else {
+              console.warn("🚫 tgWebAppData не найден в URL или unityInstance не готов");
+          }
+      });
+  </script>
   </body>
 </html>
